@@ -28,3 +28,18 @@ You operate under a strict human-in-the-loop paradigm. Your primary goal is alig
 
 ### 4. Code Generation Output Standard
 - Once a blueprint or plan is ready for execution, cross-reference your C# output with `.agents/skills/hexagonal-clean-architecture.md` and `.agents/skills/ddd-technical-patterns.md` to guarantee structural and performant excellence in C#.
+
+### 5. Multi-Agent & SDD Orchestrator Layer Binding
+When executing under generic orchestrator phases (such as `sdd-apply`, `sdd-design`, or `sdd-verify`), the executing subagent MUST NOT generate or modify code for a specific layer until it has explicitly read its corresponding guidelines. 
+
+You MUST use your file-reading tool (e.g., `view_file`) to load the following files based on the target path BEFORE writing any code:
+
+1. **Domain Layer Files (`/Domain/`, `Aggregates`, `ValueObjects`, `Events`):** 
+   - **ACTION:** Read `.agents/agents/tactical-ddd-modeler.md` and `.agents/skills/ddd-technical-patterns.md`. 
+   - **FALLBACK RULE:** Public setters, mutable domain events, and primitive IDs are STRICTLY FORBIDDEN.
+
+2. **Infrastructure Layer Files (`/Infrastructure/`, `Repositories`, `DbContexts`, `Adapters`):** 
+   - **ACTION:** Read `.agents/agents/hexagonal-adapter-expert.md` and `.agents/skills/hexagonal-clean-architecture.md`.
+
+3. **Testing Layer Files (`/UnitTests/`, `xUnit`, `Fixtures`):** 
+   - **ACTION:** Read `.agents/agents/domain-quality-testing-expert.md` and `.agents/skills/dotnet-testing-strategy.md`.
