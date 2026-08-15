@@ -1,8 +1,8 @@
-﻿using IAM.Application.Features.Users.Common.Mappers;
-using IAM.Application.Features.Users.Common.Ports;
-using SharedKernel.Enums;
+﻿using IAM.Application.Features.Users.Common.Ports;
+using IAM.Domain.Model;
 using SharedKernel.Mediator;
 using SharedKernel.Wrappers;
+using UserMapper = IAM.Application.Features.Users.Common.Mappers.UserMapper;
 
 namespace IAM.Application.Features.Users.Commands.CreateUser;
 public record CreateUserCommand(string OriginKey, string UserName, string Email, string Password, Rol Rol): IRequest<string>;
@@ -18,8 +18,8 @@ public class CreateUserCommandHandler(
         var result = await userManager.CreateUserAsync(createUser, cancellationToken);
         
         if (!result.IsSuccess)
-            return Response<string>.BusinessFail("Ocurrió un error al crear el usuario.");
+            return Response.BusinessFail<string>("Ocurrió un error al crear el usuario.");
         
-        return Response<string>.Success(result.UserName);
+        return Response.Success(result.UserName);
     }
 }

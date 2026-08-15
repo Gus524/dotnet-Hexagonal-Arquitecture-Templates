@@ -1,9 +1,8 @@
-using SharedKernel.Abstractions;
 using SharedKernel.Exceptions;
 
 namespace Prestamos.Domain.Entities;
 
-public class PrestatarioId : ValueObject
+public readonly record struct PrestatarioId
 {
     public string NoEmpleado { get; }
 
@@ -13,9 +12,5 @@ public class PrestatarioId : ValueObject
             throw new DomainException("El numero de empleado es obligatorio.");
         
         NoEmpleado = noEmpleado;
-    }
-    protected override IEnumerable<object> GetEqualityComponents()
-    {
-        yield return NoEmpleado;
     }
 }

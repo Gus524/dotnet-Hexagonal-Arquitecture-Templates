@@ -6,17 +6,23 @@ namespace ProjectExample.Prestamos.Mappers;
 
 public class PrestatarioMapper : IMapper<Prestatario, Fvempleado>
 {
-    public Prestatario Map(Fvempleado persistence)
+    public Prestatario MapToDomain(Fvempleado persistence)
     {
-        return new Prestatario(new PrestatarioId(persistence.EmpNoEmpleado.ToString()), persistence.EmpNombre);
+        var prestatrioId = new PrestatarioId(persistence.EmpNoEmpleado.ToString());
+        return new Prestatario(prestatrioId, persistence.EmpNombre);
     }
 
-    public Fvempleado Map(Prestatario domain)
+    public Fvempleado MapToPersistence(Prestatario domain)
     {
         return new Fvempleado
         {
             EmpNoEmpleado = int.Parse(domain.Id.NoEmpleado),
             EmpNombre = domain.Nombre
         };
+    }
+
+    public void MapToExistingPersistence(Prestatario domain, Fvempleado persistence)
+    {
+        persistence.EmpNoEmpleado = int.Parse(domain.Id.NoEmpleado);
     }
 }

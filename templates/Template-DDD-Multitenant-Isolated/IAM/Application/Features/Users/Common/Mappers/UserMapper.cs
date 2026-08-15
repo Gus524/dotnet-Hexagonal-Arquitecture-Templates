@@ -4,7 +4,7 @@ using Riok.Mapperly.Abstractions;
 
 namespace IAM.Application.Features.Users.Common.Mappers;
 
-[Mapper(RequiredEnumMappingStrategy = RequiredMappingStrategy.Source)]
+[Mapper(RequiredEnumMappingStrategy = RequiredMappingStrategy.Target)]
 public partial class UserMapper
 {
     public partial CreateUserDto MapToCreateDto(CreateUserCommand command);

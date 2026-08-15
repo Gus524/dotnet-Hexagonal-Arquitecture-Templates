@@ -15,7 +15,7 @@ var assemblies = new[]
 
 builder.Services.AddApplicationLayer(assemblies);
 builder.Services.AddPresentationLayer();
-builder.Services.AddInfraestructureLayer(builder.Configuration);
+builder.Services.AddInfrastructureLayer(builder.Configuration);
 builder.Services.ConfigureOptions(builder.Configuration);
 
 var app = builder.Build();

@@ -1,9 +1,5 @@
 ﻿using IAM.Application.Features.Users.Common.Ports;
-using IAM.Domain.Entities;
 using SharedKernel.Mediator;
-using SharedKernel.Ports.In;
-using SharedKernel.Ports.Out.Repository;
-using SharedKernel.Repository;
 using SharedKernel.Wrappers;
 
 namespace IAM.Application.Features.Users.Commands.UpdateUserPassword;
@@ -19,8 +15,9 @@ public class UpdateUserPasswordCommandHandler(
         var success = await userManager.ChangePassword(request.UserName, request.Password, request.NewPassword);
 
         if (!success)
-            return Response<string>.Fail("Error al actualizar la contraseña, verifique que cuente con las caracteristicas necesarias.");
+            return Response.Fail<string>(
+                "Error al actualizar la contraseña, verifique que cuente con las caracteristicas necesarias.");
         
-        return Response<string>.Success(request.UserName, "Contraseña actualizada correctamente.");
+        return Response.Success(request.UserName, "Contraseña actualizada correctamente.");
     }
 }

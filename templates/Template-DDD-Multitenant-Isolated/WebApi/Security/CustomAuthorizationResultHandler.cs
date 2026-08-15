@@ -17,7 +17,7 @@ public class CustomAuthorizationResultHandler : IAuthorizationMiddlewareResultHa
             context.Response.StatusCode = (int)HttpStatusCode.Forbidden;
             context.Response.ContentType = "application/json";
             
-            var responseModel = Response<string>.Forbbiden("Acceso denegado. No tiene los permisos requeridos.");
+            var responseModel = Response.Forbbiden<string>("Acceso denegado. No tiene los permisos requeridos.");
             
             var result = JsonSerializer.Serialize(responseModel);
             await context.Response.WriteAsync(result);
@@ -28,7 +28,7 @@ public class CustomAuthorizationResultHandler : IAuthorizationMiddlewareResultHa
         {
             context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
             context.Response.ContentType = "application/json";
-            var responseModel = Response<string>.Unauthorized("Usted no esta autorizado para consumir este recurso.");
+            var responseModel = Response.Unauthorized<string>("Usted no esta autorizado para consumir este recurso.");
             await context.Response.WriteAsync(JsonSerializer.Serialize(responseModel));
             return;
         }

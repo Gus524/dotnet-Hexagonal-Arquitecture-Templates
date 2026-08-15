@@ -7,7 +7,7 @@ public interface IUserIdentityRepository : IReadIdentityRepository, IWriteIdenti
 public interface IWriteIdentityRepository
 {
     Task<(bool IsSuccess, string UserName)> CreateUserAsync(CreateUserDto dto, CancellationToken cancellationToken = default);
-    Task<bool> UpdateUser(string userName, string password);
+    Task<bool> UpdateUser(string userName, string newUserName);
     Task<bool> ChangePassword(string userName, string oldPassword, string newPassword);
     Task<bool> DeleteUser(string userName);
 }

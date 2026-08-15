@@ -14,6 +14,7 @@ namespace Common.Mappers;
 /// </remarks>
 public interface IMapper<TDomain, TPersistence>
 {
-    TDomain Map(TPersistence persistence);
-    TPersistence Map(TDomain domain);
+    TDomain MapToDomain(TPersistence persistence);
+    TPersistence MapToPersistence(TDomain domain);
+    void MapToExistingPersistence(TDomain domain, TPersistence persistence);
 }

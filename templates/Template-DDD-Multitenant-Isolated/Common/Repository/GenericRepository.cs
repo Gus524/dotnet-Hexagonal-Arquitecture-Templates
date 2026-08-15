@@ -1,9 +1,10 @@
+using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
-using SharedKernel.Abstractions;
-using SharedKernel.Repository;
 using Common.Mappers;
-using Common.Specification;
-using SharedKernel.Specification; 
+using SharedKernel.Abstractions;
+using SharedKernel.Events;
+using SharedKernel.Repository;
+using SharedKernel.Specification;
 
 namespace Common.Repository;
 
@@ -18,15 +19,15 @@ namespace Common.Repository;
 /// <typeparam name="TContext">El contexto transaccional multitenant.</typeparam>
 public abstract class GenericRepository<TAggregate, TId, TPersistence, TContext>(
     TContext dbContext,
-    IMapper<TAggregate, TPersistence> mapper
+    IMapper<TAggregate, TPersistence> mapper,
+    IDomainEventCollector eventCollector
 ) : IRepository<TAggregate, TId>
-    where TAggregate : class, IAggregateRoot
+    where TAggregate : AggregateRoot<TId>
     where TPersistence : class
     where TContext : DbContext
+    where TId : notnull
 {
-    protected readonly TContext Context = dbContext;
-    protected readonly DbSet<TPersistence> DbSet = dbContext.Set<TPersistence>();
-    protected readonly IMapper<TAggregate, TPersistence> Mapper = mapper;
+    private readonly DbSet<TPersistence> _dbSet = dbContext.Set<TPersistence>();
 
     /// <summary>
     /// Patrón Template Method: Obliga a la implementación concreta a definir cómo 
@@ -35,71 +36,81 @@ public abstract class GenericRepository<TAggregate, TId, TPersistence, TContext>
     /// </summary>
     protected abstract object[] ExtractPrimaryKeyValues(TId id);
 
+    protected virtual IQueryable<TPersistence> OnConfigureHydration(IQueryable<TPersistence> query) => query;
+    protected abstract Expression<Func<TPersistence, bool>> FilterById(TId id);
+
     public virtual async Task<TAggregate?> GetByIdAsync(TId id, CancellationToken cancellationToken = default)
     {
-        var keyValues = ExtractPrimaryKeyValues(id);
+        IQueryable<TPersistence> query = _dbSet.AsQueryable();
         
-        var persistenceEntity = await DbSet.FindAsync(keyValues, cancellationToken);
-        return persistenceEntity == null ? null : Mapper.Map(persistenceEntity);
-    }
-
-    public virtual async Task<IReadOnlyCollection<TAggregate>> FindAsync(
-        ISpecification<TAggregate> specification, 
-        CancellationToken cancellationToken = default)
-    {
-        var query = ApplySpecification(specification);
-        var persistenceEntities = await query.ToListAsync(cancellationToken);
+        query = OnConfigureHydration(query);
         
-        return persistenceEntities.Select(Mapper.Map).ToList().AsReadOnly();
-    }
-
-    public virtual async Task<TAggregate?> FindSingleAsync(
-        ISpecification<TAggregate> specification, 
-        CancellationToken cancellationToken = default)
-    {
-        var query = ApplySpecification(specification);
-        var persistenceEntity = await query.SingleOrDefaultAsync(cancellationToken);
+        var persistence = await query 
+            .FirstOrDefaultAsync(FilterById(id), cancellationToken);
         
-        return persistenceEntity == null ? null : Mapper.Map(persistenceEntity);
+        return persistence == null ? null : mapper.MapToDomain(persistence);
     }
 
-    private IQueryable<TPersistence> ApplySpecification(ISpecification<TAggregate> spec)
+    public virtual void Add(TAggregate aggregate)
     {
-        IQueryable<TPersistence> query = DbSet;
-
-        // 1. Traducir el Criterio del Dominio a Persistencia usando nuestro ExpressionVisitor
-        if (spec.Criteria != null)
-        {
-            var mapper = new ExpressionMapper<TAggregate, TPersistence>();
-            var dataCriteria = mapper.Map(spec.Criteria);
-            query = query.Where(dataCriteria);
-        }
-
-        // 2. Aplicar Eager Loading solicitados por el dominio
-        foreach (var include in spec.Includes)
-        {
-            var includePath = IncludePathExtractor.GetPath(include);
-            query = query.Include(includePath);
-        }
-
-        return query;
-    }
-
-    public virtual async Task AddAsync(TAggregate aggregate, CancellationToken cancellationToken = default)
-    {
-        var persistenceEntity = Mapper.Map(aggregate);
-        await DbSet.AddAsync(persistenceEntity, cancellationToken);
+        eventCollector.AddAggregate(aggregate);
+        var persistence = mapper.MapToPersistence(aggregate);
+        _dbSet.Add(persistence);
     }
 
     public virtual void Update(TAggregate aggregate)
     {
-        var persistenceEntity = Mapper.Map(aggregate);
-        DbSet.Update(persistenceEntity);
+        eventCollector.AddAggregate(aggregate);
+        var key = ExtractPrimaryKeyValues(aggregate.Id);
+        var persistenceEntity = _dbSet.Find(key);
+
+        if (persistenceEntity == null)
+            throw new InvalidOperationException(
+                $"No se pudo encontrar la entidad de persistencia para el Agregado {typeof(TAggregate).Name} con ID {aggregate.Id}");
+
+        mapper.MapToExistingPersistence(aggregate, persistenceEntity);
     }
 
-    public virtual void Delete(TAggregate aggregate)
+    public virtual void Remove(TAggregate aggregate)
     {
-        var persistenceEntity = Mapper.Map(aggregate);
-        DbSet.Remove(persistenceEntity);
+        eventCollector.AddAggregate(aggregate);
+        var key = ExtractPrimaryKeyValues(aggregate.Id);
+        
+        var persistenceEntity = _dbSet.Find(key);
+        if (persistenceEntity != null)
+        {
+            dbContext.Set<TPersistence>().Remove(persistenceEntity);
+        }
     }
+
+    public virtual async Task<TAggregate?> FindSingleAsync(ISpecification<TAggregate> spec,
+        CancellationToken cancellationToken = default)
+    {
+        var query = BuildSpecificationQuery(spec);
+        var persistence = await query.SingleOrDefaultAsync(cancellationToken);
+
+        return persistence == null ? null : mapper.MapToDomain(persistence);
+    }
+
+    public virtual async Task<IEnumerable<TAggregate>> FindAsync(ISpecification<TAggregate> spec,
+        CancellationToken cancellationToken = default)
+    {
+       var query = BuildSpecificationQuery(spec);
+        var results = await query.ToListAsync(cancellationToken);
+
+        return results.Select(mapper.MapToDomain);
+    }
+
+    private IQueryable<TPersistence> BuildSpecificationQuery(ISpecification<TAggregate> spec)
+    {
+        var query = _dbSet.AsQueryable();
+        query = OnConfigureHydration(query);
+
+        query = ApplySpecification(query, spec);
+
+        return query;
+    }
+
+    protected virtual IQueryable<TPersistence> ApplySpecification(IQueryable<TPersistence> query,
+        ISpecification<TAggregate> spec) => query;
 }

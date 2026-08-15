@@ -1,4 +1,4 @@
-namespace IAM.Application.Features.Auth.Common.Ports;
+namespace Core.IAM.Application.Features.Auth.Common.Ports;
 
 public interface IAuthPort
 {
