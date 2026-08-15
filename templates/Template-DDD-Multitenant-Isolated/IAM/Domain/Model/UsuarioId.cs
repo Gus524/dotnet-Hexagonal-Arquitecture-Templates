@@ -13,4 +13,6 @@ public readonly record struct UsuarioId
         
         OriginKey = originKey;
     }
+
+    public static UsuarioId New() => new(Guid.NewGuid().ToString());
 }

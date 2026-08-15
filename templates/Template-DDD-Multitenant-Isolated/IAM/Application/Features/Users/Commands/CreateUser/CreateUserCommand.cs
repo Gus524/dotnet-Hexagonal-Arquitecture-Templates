@@ -6,7 +6,7 @@ using SharedKernel.Wrappers;
 using UserMapper = IAM.Application.Features.Users.Common.Mappers.UserMapper;
 
 namespace IAM.Application.Features.Users.Commands.CreateUser;
-public record CreateUserCommand(string OriginKey, string UserName, string Email, string Password, Rol Rol): IRequest<string>;
+public record CreateUserCommand(string OriginKey, string UserName, string Email, string? Password = null, Rol Rol = Rol.Cliente): IRequest<string>;
 
 public class CreateUserCommandHandler(
     IUserIdentityRepository userManager,
@@ -15,7 +15,12 @@ public class CreateUserCommandHandler(
 {
     public async Task<Response<string>> Handle(CreateUserCommand request, CancellationToken cancellationToken)
     {
-        var createUser = mapper.MapToCreateDto(request);
+        var effectivePassword = string.IsNullOrWhiteSpace(request.Password)
+            ? $"Temp@{Guid.NewGuid().ToString("N")[..8]}!"
+            : request.Password;
+
+        var commandWithPassword = request with { Password = effectivePassword };
+        var createUser = mapper.MapToCreateDto(commandWithPassword);
         var result = await userManager.CreateUserAsync(createUser, cancellationToken);
         
         if (!result.IsSuccess)
