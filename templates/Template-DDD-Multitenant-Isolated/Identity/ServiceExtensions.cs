@@ -8,10 +8,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using SharedKernel.Ports.Out;
 using System.Security.Claims;
 using System.Text;
-using IAM.Application.Features.Auth.Common.Ports;
+using Core.IAM.Application.Features.Auth.Common.Ports;
 using IAM.Application.Features.Users.Common.Ports;
 using SharedKernel.Ports.Out.MultiTenancy;
 using SharedKernel.Ports.Out.Repository;
@@ -22,7 +21,11 @@ public static class ServiceExtensions
 {
     public static void AddIdentityInfraestructure(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddTransient<IAuthPort, AuthAdapter>();
+        services.AddScoped<IdentityAdapter>();
+        services.AddScoped<IUserAuthenticator>(sp => sp.GetRequiredService<IdentityAdapter>());
+        services.AddScoped<ISessionRefresher>(sp => sp.GetRequiredService<IdentityAdapter>());
+        services.AddScoped<IUserProfileQuery>(sp => sp.GetRequiredService<IdentityAdapter>());
+        services.AddScoped<IAuthPort>(sp => sp.GetRequiredService<IdentityAdapter>());
         
         services.AddScoped<UserIdentityRepository>();
 

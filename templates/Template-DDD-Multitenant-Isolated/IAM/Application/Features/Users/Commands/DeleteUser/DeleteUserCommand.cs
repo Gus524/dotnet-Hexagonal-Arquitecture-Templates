@@ -1,6 +1,5 @@
 ﻿using IAM.Application.Features.Users.Common.Ports;
 using SharedKernel.Mediator;
-using SharedKernel.Ports.In;
 using SharedKernel.Wrappers;
 
 namespace IAM.Application.Features.Users.Commands.DeleteUser;
@@ -15,12 +14,12 @@ public class DeleteUserCommandHandler(
         var user = await userManager.GetUserAsync(request.UserName, cancellationToken);
 
         if (user is null)
-            return Response<Unit>.NotFound("Usuario no encontrado.");
+            return Response.NotFound<Unit>("Usuario no encontrado.");
 
         var result = await userManager.DeleteUser(user.UserName);
         if (!result)
-            return Response<Unit>.NoContent("Error al eliminar el usuario.");
+            return Response.NoContent("Error al eliminar el usuario.");
 
-        return Response<Unit>.NoContent("Usuario borrado correctamente.");
+        return Response.NoContent("Usuario borrado correctamente.");
     }
 }

@@ -24,8 +24,8 @@ public class Response<T>
     [JsonIgnore]
     public ErrorType ErrorType { get; set; }
     public Response() { }
-
-    private Response(bool succeeded, T? data, string? message, List<string>? errors, SuccessType successType,
+    
+    internal Response(bool succeeded, T? data, string? message, List<string>? errors, SuccessType successType,
         ErrorType errorType)
     {
         Succeeded = succeeded;
@@ -36,7 +36,11 @@ public class Response<T>
         ErrorType = errorType;
     }
 
-    public static Response<T> Success(T data, string? message = null)
+}
+
+public static class Response
+{
+    public static Response<T> Success<T>(T data, string? message = null)
     {
         return new Response<T>(true, data, message, null, SuccessType.Ok, default);
     }
@@ -46,38 +50,38 @@ public class Response<T>
         return new Response<Unit>(true, Unit.Value, message, null, SuccessType.NoContent, default);
     }
     
-    public static Response<T> Created(T data, string? message = null)
+    public static Response<T> Created<T>(T data, string? message = null)
     {
         return new Response<T>(true, data, message, null, SuccessType.Created, default);
     }
     
-    public static Response<T> Fail(string errorMessage, List<string> errors)
+    public static Response<T> Fail<T>(string errorMessage, List<string> errors)
     {
         return new Response<T>(false, default, errorMessage, errors, default, ErrorType.Validation);
     }
 
-    public static Response<T> Fail(string errorMessage)
+    public static Response<T> Fail<T>(string errorMessage)
     {
         return new Response<T>(false, default, errorMessage, null, default, ErrorType.Validation);
     }
     
-    public static Response<T> NotFound(string errorMessage = "Recurso no encontrado")
+    public static Response<T> NotFound<T>(string errorMessage = "Recurso no encontrado")
     {
         return new Response<T>(false, default, errorMessage, [errorMessage], default, ErrorType.NotFound);
     }
     
-    public static Response<T> Unauthorized(string errorMessage = "Usted no está autorizado para consumir este recurso.")
+    public static Response<T> Unauthorized<T>(string errorMessage = "Usted no está autorizado para consumir este recurso.")
     {
         return new Response<T>(false, default, errorMessage, [errorMessage], default, ErrorType.Unauthorized);
     }
 
-    public static Response<T> BusinessFail(string errorMesage)
+    public static Response<T> BusinessFail<T>(string errorMesage)
     {
         return new Response<T>(false, default, errorMesage, [], default, ErrorType.BusinessLogic);
     }
     
-    public static Response<T> Forbbiden(string errorMessage = "No tiene los permisos suficientes para consumir este recurso.")
+    public static Response<T> Forbbiden<T>(string errorMessage = "No tiene los permisos suficientes para consumir este recurso.")
     {
         return new Response<T>(false, default, errorMessage, [errorMessage], default, ErrorType.Forbidden);
-    }
+    } 
 }

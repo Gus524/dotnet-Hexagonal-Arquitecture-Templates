@@ -3,7 +3,6 @@ using SharedKernel.Mediator;
 using WebApi.Extensions.Bootstrap;
 using WebApi.Extensions.DependencyInjection;
 using WebApi.Extensions.Configuration;
-using SharedKernel.Ports.In;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,7 +14,7 @@ var assemblies = new[]
 
 builder.Services.AddApplicationLayer(assemblies);
 builder.Services.AddPresentationLayer();
-builder.Services.AddInfraestructureLayer(builder.Configuration);
+builder.Services.AddInfrastructureLayer(builder.Configuration);
 builder.Services.ConfigureOptions(builder.Configuration);
 
 var app = builder.Build();

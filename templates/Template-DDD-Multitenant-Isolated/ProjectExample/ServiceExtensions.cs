@@ -1,4 +1,4 @@
-using Common;
+using Common.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,7 +15,7 @@ public static class ServiceExtensions
         services.AddDbContext<ProjectExampleDbContext>(options =>
             options.UseSqlServer(configuration.GetConnectionString(TenantConstants.ProjectExample)));
 
-        services.RegisterTenantInfraestructure<ProjectExampleDbContext>(typeof(ProjectExampleDbContext).Assembly,
+        services.RegisterTenantInfrastructure<ProjectExampleDbContext>(typeof(ProjectExampleDbContext).Assembly,
             TenantConstants.ProjectExample);
     }
 }

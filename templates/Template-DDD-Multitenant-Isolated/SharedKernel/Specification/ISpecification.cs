@@ -1,10 +1,6 @@
-using System.Linq.Expressions;
-
 namespace SharedKernel.Specification;
 
-public interface ISpecification<TDomain>
+public interface ISpecification<in T>
 {
-    Expression<Func<TDomain, bool>> Criteria { get; }
-    List<Expression<Func<TDomain, object>>> Includes { get; }
-    bool IsSatisfiedBy(TDomain domain);
+    bool IsSatisfiedBy(T aggregate);
 }

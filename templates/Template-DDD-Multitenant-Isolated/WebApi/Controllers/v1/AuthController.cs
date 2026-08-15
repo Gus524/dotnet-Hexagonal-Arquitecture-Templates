@@ -1,5 +1,7 @@
-﻿using Asp.Versioning;
-using IAM.Application.Features.Auth.Commands.InicioUsuario;
+using Asp.Versioning;
+using IAM.Application.Features.Auth.Commands.CerrarSesion;
+using IAM.Application.Features.Auth.Commands.IniciarSesion;
+using IAM.Application.Features.Auth.Commands.RefrescarToken;
 using IAM.Application.Features.Auth.Queries.GetSession;
 using IAM.Application.Features.Users.Commands.CreateUser;
 using IAM.Application.Features.Users.Commands.DeleteUser;
@@ -14,16 +16,26 @@ namespace WebApi.Controllers.v1;
 [Authorize]
 public class AuthController(IMediator mediator) : BaseApiController
 {
-    [HttpPost]
+    [HttpPost("login")]
     [AllowAnonymous]
-    public async Task<IActionResult> AutenticarUsuario(InicioUsuarioCommand auth) => 
-        HandleResult(await mediator.Send(auth));
+    public async Task<IActionResult> Login([FromBody] IniciarSesionCommand command) =>
+        HandleResult(await mediator.Send(command));
+
+    [HttpPost("refresh-token")]
+    [AllowAnonymous]
+    public async Task<IActionResult> RefreshToken([FromBody] RefrescarTokenCommand command) =>
+        HandleResult(await mediator.Send(command));
+
+    [HttpPost("logout")]
+    [AllowAnonymous]
+    public async Task<IActionResult> Logout([FromBody] CerrarSesionCommand command) =>
+        HandleResult(await mediator.Send(command));
 
     [HttpGet]
     public async Task<IActionResult> ObtenerSesion() => HandleResult(await mediator.Send(new GetSessionQuery()));
     
     [HttpPost]
-    [Route("user")]
+    [Route("usuario")]
     public async Task<IActionResult> Post([FromBody] CreateUserCommand command) =>
         HandleResult(await mediator.Send(command));
 

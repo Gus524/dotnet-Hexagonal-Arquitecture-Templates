@@ -83,6 +83,6 @@ public class UserIdentityRepository(
             throw new UnauthorizedAccessException("El usuario no tiene un rol valido.");
         }
 
-        return new AuthUserDto(identity.UserName!, identity.NombreCompleto, domainRol, identity.Email);
+        return new AuthUserDto(identity.Id, identity.UserName!, identity.NombreCompleto, domainRol, identity.Email);
     }
 }

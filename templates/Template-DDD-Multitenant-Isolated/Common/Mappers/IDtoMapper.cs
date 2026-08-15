@@ -1,6 +1,6 @@
 namespace Common.Mappers;
 
-public interface IDtoMapper<TSource, TDto>
+public interface IDtoMapper<in TPersistence, out TDto>
 {
-    TDto Map(TSource source);
+    TDto Map(TPersistence persistence);
 }

@@ -29,7 +29,7 @@ public class ValidationBehavior<TRequest, TResponse>(
                     typeof(TRequest).Name,
                     errors
                 );
-                return Response<TResponse>.Fail("Errores de validación", errors);
+                return Response.Fail<TResponse>("Errores de validación", errors);
             }
         }
 

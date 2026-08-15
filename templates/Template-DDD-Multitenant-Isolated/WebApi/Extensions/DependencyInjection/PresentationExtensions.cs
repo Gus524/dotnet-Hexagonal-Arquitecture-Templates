@@ -175,7 +175,7 @@ public static class PresentationExtensions
                             .Select(e => e.ErrorMessage)
                             .ToList();
 
-                        var response = Response<object>.Fail("Errores de validación", errors);
+                        var response = Response.Fail<object>("Errores de validación", errors);
                         return new BadRequestObjectResult(response);
                     };
                 });

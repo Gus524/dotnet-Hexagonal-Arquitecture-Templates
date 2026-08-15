@@ -3,6 +3,7 @@ using IAM.Application.Features.Users.Common.Mappers;
 using SharedKernel.Behaviors;
 using SharedKernel.Ports.In;
 using System.Reflection;
+using SharedKernel.Events;
 using SharedKernel.Mediator;
 using WebApi.Mediator;
 
@@ -24,15 +25,20 @@ public static class ApplicationExtensions
         services.Scan(s => s.FromAssemblies(assemblies)
             .AddClasses(c => c.AssignableTo(typeof(IRequestHandler<,>)))
             .AsImplementedInterfaces()
-            .WithTransientLifetime());
+            .WithScopedLifetime());
 
         services.Scan(s => s.FromAssemblies(assemblies)
             .AddClasses(c => c.AssignableTo(typeof(IValidator<>)))
             .AsImplementedInterfaces()
-            .WithTransientLifetime());
+            .WithScopedLifetime());
 
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
         services.AddTransient<IMediator, InternalMediator>();
+        
+        services.AddScoped<IDomainEventDispatcher, DomainEventDispatcher>();
+        services.TryDecorate(typeof(IDomainEventSubscriber<>), typeof(ExceptionHandlingDomainEventSubscriberDecorator<>));
+        services.AddScoped<IDomainEventCollector, DomainEventCollector>();
 
         services.AddScoped<UserMapper>();
         services.AddScoped<AuthMapper>();
