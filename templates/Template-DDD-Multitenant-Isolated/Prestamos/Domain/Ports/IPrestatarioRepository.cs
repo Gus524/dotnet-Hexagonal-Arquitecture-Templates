@@ -1,4 +1,4 @@
-using Prestamos.Domain.Entities;
+using Prestamos.Domain.Model;
 using SharedKernel.Repository;
 
 namespace Prestamos.Domain.Ports;

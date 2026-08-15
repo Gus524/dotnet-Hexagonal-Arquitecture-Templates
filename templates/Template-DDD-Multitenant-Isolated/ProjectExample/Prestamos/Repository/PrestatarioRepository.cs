@@ -1,8 +1,8 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using Common.Mappers;
 using Common.Services.Prestamos;
 using Microsoft.Extensions.DependencyInjection;
-using Prestamos.Domain.Entities;
+using Prestamos.Domain.Model;
 using Prestamos.Domain.Ports;
 using ProjectExample.Context;
 using ProjectExample.Tables;

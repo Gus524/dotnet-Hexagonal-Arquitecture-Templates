@@ -1,6 +1,6 @@
-﻿using SharedKernel.Abstractions;
+using SharedKernel.Abstractions;
 
-namespace Prestamos.Domain.Entities;
+namespace Prestamos.Domain.Model;
 
 public class Prestatario : AggregateRoot<PrestatarioId>
 {

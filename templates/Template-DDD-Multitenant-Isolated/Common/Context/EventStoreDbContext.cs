@@ -1,5 +1,5 @@
 
-using Common.Extensions;
+using Common.Configurations;
 using Microsoft.EntityFrameworkCore;
 using SharedKernel.Events;
 
@@ -12,6 +12,6 @@ public class EventStoreDbContext(DbContextOptions<EventStoreDbContext> options):
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-        modelBuilder.EventStoreConfig();
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(StoredEventConfiguration).Assembly);
     }
 }

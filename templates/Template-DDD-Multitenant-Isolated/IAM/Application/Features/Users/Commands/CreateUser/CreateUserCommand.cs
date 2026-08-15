@@ -1,5 +1,6 @@
-﻿using IAM.Application.Features.Users.Common.Ports;
+using IAM.Application.Features.Users.Common.Ports;
 using IAM.Domain.Model;
+using SharedKernel.Enums;
 using SharedKernel.Mediator;
 using SharedKernel.Wrappers;
 using UserMapper = IAM.Application.Features.Users.Common.Mappers.UserMapper;

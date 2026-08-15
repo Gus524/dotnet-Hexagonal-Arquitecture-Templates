@@ -1,5 +1,5 @@
 using Common.Mappers;
-using Prestamos.Domain.Entities;
+using Prestamos.Domain.Model;
 using ProjectExample.Tables;
 
 namespace ProjectExample.Prestamos.Mappers;

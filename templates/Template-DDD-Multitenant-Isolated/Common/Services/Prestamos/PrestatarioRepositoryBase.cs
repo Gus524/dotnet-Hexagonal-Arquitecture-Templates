@@ -1,7 +1,7 @@
 using Common.Mappers;
 using Common.Repository;
 using Microsoft.EntityFrameworkCore;
-using Prestamos.Domain.Entities;
+using Prestamos.Domain.Model;
 using SharedKernel.Events;
 
 namespace Common.Services.Prestamos;

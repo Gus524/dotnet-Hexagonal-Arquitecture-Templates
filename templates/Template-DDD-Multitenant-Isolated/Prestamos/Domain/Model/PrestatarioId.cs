@@ -1,6 +1,6 @@
 using SharedKernel.Exceptions;
 
-namespace Prestamos.Domain.Entities;
+namespace Prestamos.Domain.Model;
 
 public readonly record struct PrestatarioId
 {
