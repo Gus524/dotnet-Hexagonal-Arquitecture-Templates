@@ -27,10 +27,11 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Common\Common.csproj" />
+      <ProjectReference Include="..\EventsIntegration\EventsIntegration.csproj" />
       <ProjectReference Include="..\SharedKernel\SharedKernel.csproj" />
       <ProjectReference Include="..\Prestamos\Prestamos.csproj" />
       <ProjectReference Include="..\IAM\IAM.csproj" />
-      <ProjectReference Include="..\EventsIntegration\EventsIntegration.csproj" />
     </ItemGroup>
 
 </Project>
